@@ -3,6 +3,13 @@ _Por Caio Godoy at caioafgod@gmail.com_
 
 Esse arquivo serve como uma pequena documentação com as informações de uso e decisões de implementação do trabalho, bem como uma lista com as principais funcionalidades do jogo.
 
+## Controles
+- Mouse: movimenta Paddle
+- S: começa o nivel
+- W: pausa o jogo (originalmente botão esquerdo do mouse)
+- R: reinicia o jogo para a primeira fase
+- Q: encerra o programa
+
 ## Lista de funcionalidades do jogo
 
 1. A tecla Q, pressionada em qualquer momento, termina o programa.
@@ -18,6 +25,10 @@ Esse arquivo serve como uma pequena documentação com as informações de uso e
 6. 3 niveis de dificuldade. O nivel 2 diminui o tamanho do paddle e o nivel 3 aumenta a velocidade inicial da bola sem voltar o paddle para o tamanho normal, o que faz com o que o nivel seja muito dificil.
 
 7. O paddle muda a direção da bola dependendo de onde a bola bater. Se ela bate nos cantos ela é mandada para o sentido do canto, independente de como ela está vindo, mas se ela bate no meio do paddle ela continua na trajetoria normal.
+
+## Especificação e Implementação
+
+_Wokring on it_
 
 ## Maneiras de executar o projeto:
 

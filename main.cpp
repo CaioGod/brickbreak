@@ -4,29 +4,29 @@
 #include <string.h>
 #include <math.h>
 
-int score = 0;
-int pause = 0;
-int brick_color = 2, ball_color = 1, level = 1, paddle_color = 1, text_color = 5, size = 1;
-GLfloat twoModel[] = {GL_TRUE};
-int game_level[] = {7, 5, 2};
-float rate = game_level[level];
-
-//red, geen, blue
-GLfloat brick_color_array[][3] = {{0, 0, 1}, {1, 0, 0}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {0, 1, 1}};
-GLfloat paddle_color_array[][3] = {{1, 0, 0}, {0, 0, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {0, 1, 1}};
-GLfloat text_color_array[][4] = {{1, 0, 0, 1}, {0, 0, 1, 1}, {0, 1, 0, 1}, {1, 0, 1, 1}, {1, 1, 0, 1}, {0, 1, 1, 1}};
-GLfloat paddle_size[] = {2, 4, 6};
-
-//The grid parameters for the bricks
-int rows = 6;
-int columns = 10;
-
 // Structure to store the coordinates of each brick
 struct brick_coords
 {
     GLfloat x;
     GLfloat y;
 };
+
+int score = 0;
+int pause = 0;
+GLfloat twoModel[] = {GL_TRUE};
+int brick_color = 0, level = 0, size = 0;
+int game_level[] = {7, 3};
+GLfloat paddle_size[] = {4, 2};
+float rate = game_level[level];
+
+//red, geen, blue
+GLfloat brick_color_array[][3] = {{0, 1, 1}, {0, 1, 0}, {1, 0, 0}};
+GLfloat paddle_color[3] = {0, 0, 1};
+GLfloat text_color[4] = {1, 0, 0, 1};
+
+//The grid parameters for the bricks
+int rows = 4;
+int columns = 10;
 
 //Array to store the bricks
 brick_coords brick_array[50][50];
@@ -36,7 +36,7 @@ GLfloat px, bx = 0, by = -12.8, speed = 0, dirx = 0, diry = 0, auxx = 0, auxy = 
 void draw_paddle()
 {
     glDisable(GL_LIGHTING);
-    glColor3fv(paddle_color_array[paddle_color]);
+    glColor3fv(paddle_color);
     glBegin(GL_POLYGON);
     glVertex3f(-paddle_size[size] + px, 0 - 15, 0);
     glVertex3f(paddle_size[size] + px, 0 - 15, 0);
@@ -63,7 +63,6 @@ void brick(GLfloat x, GLfloat y, GLfloat z)
 // Function to draw the grid of bricks
 void draw_bricks()
 {
-
     int i, j;
     if (start == 0)
     {
@@ -71,8 +70,7 @@ void draw_bricks()
         {
             for (j = 1; j <= columns; j++)
             {
-
-                brick_array[i][j].x = (GLfloat)(j * 4 * 0.84);
+                brick_array[i][j].x = (GLfloat)(j * 4 * 0.78);
                 brick_array[i][j].y = (GLfloat)(i * 2 * 0.6);
             }
         }
@@ -99,15 +97,11 @@ void draw_bricks()
 //Function to draw the spherical ball
 void draw_ball()
 {
-
-    float materialColours[][3] = {{1, 0, 0}, {0, 0, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {0, 1, 1}};
-
     glDisable(GL_LIGHTING);
     glPushMatrix();
-    glColor3f(0, 1, 1);
+    glColor3f(1, 1, 1);
     glTranslatef(bx, by, 0);
     glScalef(1.0, 1.0, 0.5);
-
     glutSolidSphere(1.0, 30, 30);
 
     glPopMatrix();
@@ -134,66 +128,18 @@ void mousemotion(int x, int y)
         glutSetCursor(GLUT_CURSOR_INHERIT);
 }
 
-//handle brick color
-void change_brick_color(int action)
-{
-
-    brick_color = action - 1;
-}
-
-//handle level
-void change_difficulty(int action)
-{
-
-    level = action - 1;
-}
-
-//handle menu
-void handle_menu(int action)
-{
-}
-
-//handle paddle color
-void change_paddle_color(int action)
-{
-    paddle_color = action - 1;
-}
-
-//handle paddle color
-void change_text_color(int action)
-{
-    text_color = action - 1;
-}
-
-//handle paddle size
-void change_paddle_size(int action)
-{
-    size = action - 1;
-}
-
-//add menu
-void addMenu()
-{
-    int submenu6 = glutCreateMenu(change_paddle_size);
-    glutAddMenuEntry("Small", 1);
-    glutAddMenuEntry("Medium", 2);
-    glutAddMenuEntry("Large", 3);
-
-    glutCreateMenu(handle_menu);
-    glutAddSubMenu("Paddle Size", submenu6);
-    glutAttachMenu(GLUT_RIGHT_BUTTON);
-}
-
 //Function to print the score on the screen
 void text(int sc)
 {
     glDisable(GL_LIGHTING);
     char text[40];
-    if (sc < 60)
-        sprintf(text, "Your Score: %d", sc);
-    else
+    if (sc == 0 && size == 0)
+        sprintf(text, "Level 1");
+    else if (sc == 40)
     {
-        sprintf(text, "You have won !!");
+        sprintf(text, "You have won !!! Wanna try level 2?");
+        brick_color = 1;
+        size = 1;
         start = 0;
         by = -12.8;
         bx = 0;
@@ -201,12 +147,29 @@ void text(int sc)
         diry = 0;
         px = 0;
     }
+    else if (sc == 80)
+    {
+        sprintf(text, "You have won !!! Wanna try level 3?");
+        brick_color = 2;
+        size = 1;
+        level = 1;
+        start = 0;
+        by = -12.8;
+        bx = 0;
+        dirx = 0;
+        diry = 0;
+        px = 0;
+    }
+    else
+    {
+        sprintf(text, "Your Score: %d", sc);
+    }
     // The color
-    glColor4fv(text_color_array[text_color]);
+    glColor4fv(text_color);
     // Position of the text to be printer
     glPushMatrix();
     glTranslatef(-1, 0, 0);
-    glRasterPos3f(0, 0, 20);
+    glRasterPos3f(0, 0, 15);
     for (int i = 0; text[i] != '\0'; i++)
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
     glEnable(GL_LIGHTING);
@@ -263,10 +226,12 @@ void keyboard(unsigned char key, int x, int y)
             dirx = auxx;
             diry = auxy;
         }
-
         pause = 1 - pause;
         break;
     case 'r':
+        level = 0;
+        size = 0;
+        brick_color = 0;
         start = 0;
         by = -12.8;
         bx = 0;
@@ -281,7 +246,6 @@ void keyboard(unsigned char key, int x, int y)
             rate = game_level[level];
             start = 1;
             score = 0;
-            // glutSetCursor(GLUT_CURSOR_NONE);
         }
         break;
     }
@@ -317,7 +281,6 @@ void hit()
 
                     score++;
                 }
-                //cout<<bx<<" "<<by<<"\t"<<brick_array[i][j].x<<" "<<brick_array[i][j].y;
             }
             else if (by >= brick_array[i][j].y + 5 - 0.1 && by <= brick_array[i][j].y + 5 + 1.2 + 0.1)
             {
@@ -328,7 +291,6 @@ void hit()
                     dirx = dirx * -1;
                     score++;
                 }
-                //cout<<bx<<" "<<by<<"\t"<<brick_array[i][j].x<<" "<<brick_array[i][j].y;
             }
         }
 }
@@ -392,16 +354,15 @@ int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(1000, 1000);
+    glutInitWindowSize(900, 900);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("Brick Breaker");
+    glutCreateWindow("Brickbreaker");
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glEnable(GL_DEPTH_TEST);
     glutIdleFunc(idle);
     glutPassiveMotionFunc(mousemotion);
     glutKeyboardFunc(keyboard);
-    addMenu();
 
     glutMainLoop();
     return 0;

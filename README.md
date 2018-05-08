@@ -1,4 +1,4 @@
-# Brickbreak por Caio Godoy 
+# Breakout por Caio Godoy 
 _Por Caio Godoy at caioafgod@gmail.com_
 
 Esse arquivo serve como uma pequena documentação com as informações de uso e decisões de implementação do trabalho, bem como uma lista com as principais funcionalidades do jogo.
@@ -9,6 +9,7 @@ Esse arquivo serve como uma pequena documentação com as informações de uso e
 - W: pausa o jogo (originalmente botão esquerdo do mouse)
 - R: reinicia o jogo para a primeira fase
 - Q: encerra o programa
+- A e D: movimentação alternativa do paddle (apenas para noobs como eu)
 
 ## Lista de funcionalidades do jogo
 
@@ -26,17 +27,17 @@ Esse arquivo serve como uma pequena documentação com as informações de uso e
 
 7. O paddle muda a direção da bola dependendo de onde a bola bater. Se ela bate nos cantos ela é mandada para o sentido do canto, independente de como ela está vindo, mas se ela bate no meio do paddle ela continua na trajetoria normal.
 
+## Melhorias após a apresentação:
+
+1. O paddle agora se movimenta como deveria pela especificação, ele tem uma velocidade V que aumenta gradualmente baseada na distancia do centro. Se ele estiver dentro de uma area central ele fica com V = 0.
+
+2. A coloração dos blocos agora usa interpolação (vertices possuem cores diferentes)
+
 ## Especificação e Implementação
 
 _Wokring on it_
 
 ## Maneiras de executar o projeto:
-
-### Pelo terminal:
-```
-gcc -framework OpenGL -framework GLUT main.cpp -o brickbreak -Wno-deprecated
-./brickbreak
-```
 
 #### Usando Makefile:
 ```
@@ -45,4 +46,10 @@ make run
 #### Apagando arquivos depois de executar
 ```
 make clean
+```
+
+### Pelo terminal:
+```
+gcc -framework OpenGL -framework GLUT main.cpp -o brickbreak -Wno-deprecated
+./brickbreak
 ```

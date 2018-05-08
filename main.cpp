@@ -14,28 +14,22 @@ struct brick_coords
 int score = 0;
 int pause = 0;
 GLfloat twoModel[] = {GL_TRUE};
-int brick_color = 0, level = 0, size = 0;
 int game_level[] = {7, 3};
 GLfloat paddle_size[] = {4, 2};
+int level = 0, size = 0;
 float rate = game_level[level];
-
-//red, geen, blue
-GLfloat brick_color_array[][3] = {{0, 1, 1}, {0, 1, 0}, {1, 0, 0}};
 GLfloat paddle_color[3] = {0, 0, 1};
 GLfloat text_color[4] = {1, 0, 0, 1};
 
-//The grid parameters for the bricks
 int rows = 4;
 int columns = 10;
 
 //Array to store the bricks
-brick_coords brick_array[50][50];
-GLfloat px, bx = 0, by = -12.8, speed = 0, dirx = 0, diry = 0, auxx = 0, auxy = 0, start = 0;
+brick_coords brick_matrix[50][50];
+GLfloat v, mx, px, ball_y = -13.0, ball_x = 0, speed = 0, dirx = 0, diry = 0, auxv = 0, auxx = 0, auxy = 0, start = 0;
 
-// Function to draw the paddle
 void draw_paddle()
 {
-    glDisable(GL_LIGHTING);
     glColor3fv(paddle_color);
     glBegin(GL_POLYGON);
     glVertex3f(-paddle_size[size] + px, 0 - 15, 0);
@@ -43,24 +37,22 @@ void draw_paddle()
     glVertex3f(paddle_size[size] + px, 1 - 15, 0);
     glVertex3f(-paddle_size[size] + px, 1 - 15, 0);
     glEnd();
-    glEnable(GL_LIGHTING);
 }
 
-//Function to draw a single brick
-void brick(GLfloat x, GLfloat y, GLfloat z)
+void draw_single_brick(GLfloat x, GLfloat y, GLfloat z)
 {
-    glDisable(GL_LIGHTING);
-    glColor3fv(brick_color_array[brick_color]);
     glBegin(GL_QUADS);
+    glColor3f(0, 1, size);
     glVertex3f(x, y, z);
+    glColor3f(size, level, 1);
     glVertex3f(x + 3, y, z);
+    glColor3f(level, 0, size);
     glVertex3f(x + 3, y + 1, z);
+    glColor3f(1, level, size);
     glVertex3f(x, y + 1, z);
     glEnd();
-    glEnable(GL_LIGHTING);
 }
 
-// Function to draw the grid of bricks
 void draw_bricks()
 {
     int i, j;
@@ -70,8 +62,8 @@ void draw_bricks()
         {
             for (j = 1; j <= columns; j++)
             {
-                brick_array[i][j].x = (GLfloat)(j * 4 * 0.78);
-                brick_array[i][j].y = (GLfloat)(i * 2 * 0.6);
+                brick_matrix[i][j].y = (GLfloat)(i * 2 * 0.7);
+                brick_matrix[i][j].x = (GLfloat)(j * 4 * 0.80);
             }
         }
     }
@@ -84,65 +76,39 @@ void draw_bricks()
         for (j = 1; j <= columns; j += 1)
         {
 
-            if (brick_array[i][j].x == 0 || brick_array[i][j].y == 0)
+            if (brick_matrix[i][j].x == 0 || brick_matrix[i][j].y == 0)
             {
                 continue;
             }
-            brick(brick_array[i][j].x, brick_array[i][j].y, 0);
+            draw_single_brick(brick_matrix[i][j].x, brick_matrix[i][j].y, 0);
         }
     }
     glPopMatrix();
 }
 
-//Function to draw the spherical ball
 void draw_ball()
 {
-    glDisable(GL_LIGHTING);
     glPushMatrix();
     glColor3f(1, 1, 1);
-    glTranslatef(bx, by, 0);
+    glTranslatef(ball_x, ball_y, 0);
     glScalef(1.0, 1.0, 0.5);
     glutSolidSphere(1.0, 30, 30);
 
     glPopMatrix();
 }
 
-//mouse function
-void mousemotion(int x, int y)
-{
-
-    if (start == 1 && pause != 1)
-    {
-        px = (x - glutGet(GLUT_WINDOW_WIDTH) / 2) / 20;
-        if (px > 15)
-        {
-            px = 15;
-        }
-        if (px < -15)
-        {
-            px = -15;
-        }
-    }
-
-    else
-        glutSetCursor(GLUT_CURSOR_INHERIT);
-}
-
-//Function to print the score on the screen
 void text(int sc)
 {
-    glDisable(GL_LIGHTING);
     char text[40];
     if (sc == 0 && size == 0)
-        sprintf(text, "Level 1");
+        sprintf(text, "Level 1 press S to start");
     else if (sc == 40)
     {
         sprintf(text, "You have won !!! Wanna try level 2?");
-        brick_color = 1;
         size = 1;
         start = 0;
-        by = -12.8;
-        bx = 0;
+        ball_y = -12.8;
+        ball_x = 0;
         dirx = 0;
         diry = 0;
         px = 0;
@@ -150,12 +116,11 @@ void text(int sc)
     else if (sc == 80)
     {
         sprintf(text, "You have won !!! Wanna try level 3?");
-        brick_color = 2;
         size = 1;
         level = 1;
         start = 0;
-        by = -12.8;
-        bx = 0;
+        ball_y = -12.8;
+        ball_x = 0;
         dirx = 0;
         diry = 0;
         px = 0;
@@ -172,11 +137,29 @@ void text(int sc)
     glRasterPos3f(0, 0, 15);
     for (int i = 0; text[i] != '\0'; i++)
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
-    glEnable(GL_LIGHTING);
     glPopMatrix();
 }
 
-//The main display function
+void mouse(int x, int y)
+{
+    float point[2];
+    if (start == 1 && pause != 1)
+    {
+        mx = (x - glutGet(GLUT_WINDOW_WIDTH) / 2) / 20;
+        if (mx > -0.5 && mx < 0.5)
+        {
+            v = 0;
+        }
+        else
+        {
+            v = mx * 0.05368;
+        }
+    }
+
+    else
+        glutSetCursor(GLUT_CURSOR_INHERIT);
+}
+
 void display(void)
 {
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -200,8 +183,7 @@ void reshape(int w, int h)
     glMatrixMode(GL_MODELVIEW);
 }
 
-//function to take in keyboard entries
-void keyboard(unsigned char key, int x, int y)
+void hotkeys(unsigned char key, int x, int y)
 {
     switch (key)
     {
@@ -219,10 +201,13 @@ void keyboard(unsigned char key, int x, int y)
         {
             auxx = dirx;
             auxy = diry;
+            auxv = v;
             dirx = diry = 0;
+            v = 0;
         }
         else
         {
+            v = auxv;
             dirx = auxx;
             diry = auxy;
         }
@@ -231,13 +216,13 @@ void keyboard(unsigned char key, int x, int y)
     case 'r':
         level = 0;
         size = 0;
-        brick_color = 0;
         start = 0;
-        by = -12.8;
-        bx = 0;
+        ball_y = -12.8;
+        ball_x = 0;
         dirx = 0;
         diry = 0;
         px = 0;
+        v = 0;
         break;
     case 's':
         if (!start)
@@ -249,103 +234,112 @@ void keyboard(unsigned char key, int x, int y)
         }
         break;
     }
-    if (px > 15)
+    if (start == 0)
     {
-        px = 15;
+        px = 0;
     }
     if (px < -15)
     {
         px = -15;
     }
-    if (start == 0)
+    if (px > 15)
     {
-        px = 0;
+        px = 15;
     }
     glutPostRedisplay();
 }
 
-//Function to handle the case when the ball strikes the bricks
-void hit()
+void collision()
 {
     int i, j;
     for (i = 1; i <= rows; i++)
         for (j = 1; j <= columns; j++)
         {
-            if ((bx >= brick_array[i][j].x - 19.5 - 0.1) && (bx <= brick_array[i][j].x + 3 - 19.5 + 0.1))
+            if ((ball_x <= brick_matrix[i][j].x + 3 - 19.5 + 0.1) && (ball_x >= brick_matrix[i][j].x - 19.5 - 0.1))
             {
-                if (by >= brick_array[i][j].y + 5 - 0.1 && by <= brick_array[i][j].y + 5 + 1.2 + 0.1)
+                if (ball_y <= brick_matrix[i][j].y + 5 + 1.2 + 0.1 && ball_y >= brick_matrix[i][j].y + 5 - 0.1)
                 {
-                    brick_array[i][j].x = 0;
-                    brick_array[i][j].y = 0;
-                    diry = diry * -1;
-
+                    brick_matrix[i][j].y = 0;
+                    brick_matrix[i][j].x = 0;
                     score++;
+                    diry = diry * -1;
                 }
             }
-            else if (by >= brick_array[i][j].y + 5 - 0.1 && by <= brick_array[i][j].y + 5 + 1.2 + 0.1)
+            else if (ball_y <= brick_matrix[i][j].y + 5 + 1.2 + 0.1 && ball_y >= brick_matrix[i][j].y + 5 - 0.1)
             {
-                if ((bx >= brick_array[i][j].x - 19.5 - 0.1) && (bx <= brick_array[i][j].x + 3 - 19.5 + 0.1))
+                if ((ball_x <= brick_matrix[i][j].x + 3 - 19.5 + 0.1) && (ball_x >= brick_matrix[i][j].x - 19.5 - 0.1))
                 {
-                    brick_array[i][j].x = 0;
-                    brick_array[i][j].y = 0;
-                    dirx = dirx * -1;
+                    brick_matrix[i][j].x = 0;
+                    brick_matrix[i][j].y = 0;
                     score++;
+                    dirx = dirx * -1;
                 }
             }
         }
 }
 
-//The idle function. Handles the motion of the ball along with rebounding from various surfaces
-void idle()
+void game()
 {
-    hit();
-    if (bx < -16 || (bx > 16 && start == 1))
+    collision();
+
+    px += v;
+    if (px < -15)
     {
-        dirx = dirx * -1;
+        px = -15;
     }
-    if (by < -15 || (by > 14 && start == 1))
+    if (px > 15)
+    {
+        px = 15;
+    }
+
+    if (ball_y < -15 || (ball_y > 14 && start == 1))
     {
         diry = diry * -1;
     }
-    bx += dirx / (rate);
-    by += diry / (rate);
+    if (ball_x < -16 || (ball_x > 16 && start == 1))
+    {
+        dirx = dirx * -1;
+    }
+    ball_x += dirx / (rate);
+    ball_y += diry / (rate);
     rate -= 0.001; // Rate at which the speed of ball increases
 
     float x = paddle_size[size];
-    //Make changes here for the different position of ball after rebounded by paddle
-    if (by <= -12.8 && bx < (px + x * 2 / 3) && bx > (px + x / 3) && start == 1)
+    //Make changes here for the different position of ball after rebounded ball_y paddle
+    if (ball_y <= -12.8 && ball_x < (px + x * 2 / 3) && ball_x > (px + x / 3) && start == 1)
     {
         dirx = 1;
         diry = 1;
     }
-    else if (by <= -12.8 && bx < (px - x / 3) && bx > (px - x * 2 / 3) && start == 1)
-    {
-        dirx = -1;
-        diry = 1;
-    }
-    else if (by <= -12.8 && bx < (px + x / 3) && bx > (px - x / 3) && start == 1)
+    else if (ball_y <= -12.8 && ball_x < (px + x / 3) && ball_x > (px - x / 3) && start == 1)
     {
         dirx = dirx;
         diry = 1;
     }
-    else if (by <= -12.8 && bx < (px - (x * 2 / 3)) && bx > (px - (x + 0.3)) && start == 1)
+    else if (ball_y <= -12.8 && ball_x < (px - x / 3) && ball_x > (px - x * 2 / 3) && start == 1)
     {
-        dirx = -1.5;
-        diry = 0.8;
+        dirx = -1;
+        diry = 1;
     }
-    else if (by <= -12.8 && bx < (px + (x + 0.3)) && bx > (px + x / 3) && start == 1)
+    else if (ball_y <= -12.8 && ball_x < (px + (x + 0.3)) && ball_x > (px + x / 3) && start == 1)
     {
         dirx = 1.5;
         diry = 0.8;
     }
-    else if (by < -13)
+    else if (ball_y <= -12.8 && ball_x < (px - (x * 2 / 3)) && ball_x > (px - (x + 0.3)) && start == 1)
+    {
+        dirx = -1.5;
+        diry = 0.8;
+    }
+    else if (ball_y < -15)
     {
         start = 0;
-        by = -12.8;
-        bx = 0;
+        ball_y = -12.8;
+        ball_x = 0;
         dirx = 0;
         diry = 0;
         px = 0;
+        v = 0;
     }
     glutPostRedisplay();
 }
@@ -356,13 +350,13 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(900, 900);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("Brickbreaker");
+    glutCreateWindow("Breakout");
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glEnable(GL_DEPTH_TEST);
-    glutIdleFunc(idle);
-    glutPassiveMotionFunc(mousemotion);
-    glutKeyboardFunc(keyboard);
+    glutIdleFunc(game);
+    glutKeyboardFunc(hotkeys);
+    glutPassiveMotionFunc(mouse);
 
     glutMainLoop();
     return 0;

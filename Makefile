@@ -2,13 +2,13 @@ CC = g++
 DEPS =
 LDFLAGS = -framework GLUT -framework OpenGL -Wno-deprecated
 
-all: brickbreak
+all: breakout
 
 brickbreak: main.cpp
-	$(CC) $(LDFLAGS) main.cpp -o brickbreak
+	$(CC) $(LDFLAGS) main.cpp -o breakout
 
 clean:
-	rm brickbreak
+	rm breakout
 
 run: brickbreak
-	./brickbreak
+	./breakout

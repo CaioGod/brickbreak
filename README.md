@@ -5,10 +5,11 @@ Esse arquivo serve como uma pequena documentação com as informações de uso e
 
 ## Controles
 - Mouse: movimenta Paddle
-- S: começa o nivel
-- W: pausa o jogo (originalmente botão esquerdo do mouse)
-- R: reinicia o jogo para a primeira fase
-- Q: encerra o programa
+- S: Começa o jogo ou sai do modo DEBUG
+- G: Entra no modo DEBUG (originalmente botão direito do mouse)
+- W: Pausa o jogo (originalmente botão esquerdo do mouse)
+- R: Reinicia o jogo para a primeira fase
+- Q: Encerra o programa
 - A e D: movimentação alternativa do paddle (apenas para noobs como eu)
 
 ## Lista de funcionalidades do jogo
@@ -31,11 +32,28 @@ Esse arquivo serve como uma pequena documentação com as informações de uso e
 
 1. O paddle agora se movimenta como deveria pela especificação, ele tem uma velocidade V que aumenta gradualmente baseada na distancia do centro. Se ele estiver dentro de uma area central ele fica com V = 0.
 
-2. A coloração dos blocos agora usa interpolação (vertices possuem cores diferentes)
+2. A coloração dos blocos agora usa interpolação (vertices possuem cores diferentes) e mudança na coloração da bola
+
+3. MODO DEBUG ('g'), pausa o jogo e imprime dados da bola e do paddle, caso pressionado novamente executa uma iteração do código.
+
 
 ## Especificação e Implementação
 
-_Wokring on it_
+Lista de funções e pequenas descrições:
+
+- **void draw_paddle()**: desenha paddle em função da variavel global px
+- **void draw_single_brick(x, y, z)**: rasteriza 1 unico tijolo baseado na posicao inicial x e y
+- **void draw_bricks()**: desenha a matriz de tijolos usando a função draw_single_brick()
+- **void draw_ball()**: desenha a bola baseado nas variaveis globais px e py
+- **void text(sc)**: rasteriza os textos necessários baseados no SCORE sc
+- **void mouse(x, y)**: realiza a lógica de input do teclado
+- **void display()**: configura opções do display como posição da camera, e chama as funções de draw()
+- **void reshape(w, h)**: serve para fazer o reshape da matriz de projeção e da projeção perspectiva
+- **void collision()**: verifica colisões para destruir tijolos e mudar a direção da bola
+- **void debug()**: ativa o modo de debug
+- **void hotkeys(key, x, y)**: função que recebe e trata os inputs do teclado
+- **void game()**: função principal que realiza o loop para tratar do jogo
+- **void main()**: função principal que chama quase todas as outras para iniciar o programa.
 
 ## Maneiras de executar o projeto:
 
